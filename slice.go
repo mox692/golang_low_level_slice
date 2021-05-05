@@ -33,10 +33,7 @@ func Createslice(length, cap int, elm ...int) (*slice, error) {
 				backgroundArr[i] = elm[i]
 			}
 		}
-		slice := &slice{}
-		slice.Cap = cap
-		slice.Len = length
-		slice.Data = unsafe.Pointer(&backgroundArr)
+		slice := &slice{Cap: cap, Len: length, Data: unsafe.Pointer(&backgroundArr)}
 		return slice, nil
 	} else if cap < 100 {
 		var backgroundArr [HND]int
@@ -47,10 +44,7 @@ func Createslice(length, cap int, elm ...int) (*slice, error) {
 			}
 		}
 
-		slice := &slice{}
-		slice.Cap = cap
-		slice.Len = length
-		slice.Data = unsafe.Pointer(&backgroundArr)
+		slice := &slice{Cap: cap, Len: length, Data: unsafe.Pointer(&backgroundArr)}
 		return slice, nil
 	} else if cap < 1000 {
 		var backgroundArr [THOUS]int
@@ -61,10 +55,7 @@ func Createslice(length, cap int, elm ...int) (*slice, error) {
 			}
 		}
 
-		slice := &slice{}
-		slice.Cap = cap
-		slice.Len = length
-		slice.Data = unsafe.Pointer(&backgroundArr)
+		slice := &slice{Cap: cap, Len: length, Data: unsafe.Pointer(&backgroundArr)}
 		return slice, nil
 	} else {
 		return nil, errors.New("cannot create slice which cap is over 1000.")
@@ -110,4 +101,23 @@ func (s *slice) Set(index, value int) error {
 	*(*int)(ptr) = value
 
 	return nil
+}
+
+// ※user入力のsliceは許可する
+func (s *slice) Append(input []int) error {
+	return nil
+}
+
+// callbackはerrを返さない想定.
+// errは起こらないはず(slice構造体内部のデータからLenを取得してるので)なので、errは握り潰す
+func (s *slice) Map(callback func(int) int) {
+	for i := 0; i < s.Len; i++ {
+		val, _ := s.Get(i)
+		result := callback(val)
+		s.Set(i, result)
+	}
+}
+
+func (s *slice) Filter(callback func(int) int) {
+
 }
