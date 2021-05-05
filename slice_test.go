@@ -8,6 +8,9 @@ import (
 sliceのpointerまでをtestするのは難しいので、errが返ってくるか返ってこないかでtestを行う
 */
 
+/*
+	Createslice's test.
+*/
 type testInput struct {
 	len int
 	cap int
@@ -38,6 +41,9 @@ func Test_Createslice(t *testing.T) {
 	}
 }
 
+/*
+	at's test.
+*/
 func Test_at(t *testing.T) {
 	slice, err := Createslice(3, 3, 1, 2, 3)
 	if err != nil {
@@ -61,6 +67,9 @@ func Test_at(t *testing.T) {
 	}
 }
 
+/*
+	Get's test.
+*/
 type getResult struct {
 	input  int
 	expect int
@@ -92,6 +101,9 @@ func Test_Get(t *testing.T) {
 	}
 }
 
+/*
+	Set's test.
+*/
 type setInput struct {
 	index int
 	value int
@@ -123,4 +135,54 @@ func Test_Set(t *testing.T) {
 			t.Errorf("expect %d, but got %d\n", v.value, result)
 		}
 	}
+}
+
+/*
+	Map's test.
+*/
+func cb1(a int) int {
+	return a * 2
+}
+func cb2(a int) int {
+	if a < 0 {
+		return -1 * a
+	} else {
+		return a
+	}
+}
+
+type map_testcase struct {
+	len      int
+	callback func(int) int
+	init     []int
+	expected []int
+}
+
+func Test_Map(t *testing.T) {
+
+	test_case := []map_testcase{
+		{
+			len:      5,
+			callback: cb1,
+			init:     []int{3, 45, 6, 7, 3},
+			expected: []int{6, 90, 12, 14, 6},
+		},
+	}
+
+	for _, v := range test_case {
+		slice, err := Createslice(v.len, v.len, v.init...)
+		if err != nil {
+			t.Errorf("err: %+v\n", err)
+		}
+
+		slice.Map(v.callback)
+
+		for i := 0; i < slice.Len; i++ {
+			val, _ := slice.Get(i)
+			if val != v.expected[i] {
+				t.Errorf("expect %d, but got %d\n", v.expected[i], val)
+			}
+		}
+	}
+
 }
