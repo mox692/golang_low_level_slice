@@ -11,7 +11,7 @@ type testInput struct {
 	elm []int
 }
 
-func Test_createslice(t *testing.T) {
+func Test_Createslice(t *testing.T) {
 
 	// negative value -> err, positive value -> noerr
 	inputs := map[int]testInput{
@@ -23,7 +23,7 @@ func Test_createslice(t *testing.T) {
 
 	for i, v := range inputs {
 		fmt.Println(len(inputs))
-		ptr, err := createslice(v.len, v.cap, v.elm...)
+		ptr, err := Createslice(v.len, v.cap, v.elm...)
 		if err == nil && ptr == nil {
 			t.Errorf("ptr is nil\n")
 		}
