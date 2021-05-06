@@ -5,16 +5,19 @@ import (
 	"unsafe"
 )
 
+type size = int
+
 const (
-	TEN   = 10
-	HND   = 100
-	THOUS = 1000
+	TEN   size = 10
+	HND   size = 100
+	THOUS size = 1000
 )
 
 type slice struct {
 	Data unsafe.Pointer
 	Len  int
 	Cap  int
+	Size size
 }
 
 func Createslice(length, cap int, elm ...int) (*slice, error) {
@@ -73,6 +76,7 @@ func (s *slice) at(index int) (unsafe.Pointer, error) {
 	return unsafe.Pointer(uintptr(s.Data) + uintptr(index)*unsafe.Sizeof(int(0))), nil
 }
 
+// TODO: errじゃなくてpanicを起こしてもいいかも
 func (s *slice) Get(index int) (int, error) {
 	if index < 0 {
 		return 0, errors.New("index must be positive value.")
@@ -119,5 +123,4 @@ func (s *slice) Map(callback func(int) int) {
 }
 
 func (s *slice) Filter(callback func(int) int) {
-
 }
