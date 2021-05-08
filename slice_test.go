@@ -28,7 +28,7 @@ func Test_Createslice(t *testing.T) {
 	}
 
 	for i, v := range inputs {
-		ptr, err := Createslice(v.len, v.cap, v.elm...)
+		ptr, err := CreatesliceE(v.len, v.cap, v.elm...)
 		if err == nil && ptr == nil {
 			t.Errorf("ptr is nil\n")
 		}
@@ -45,7 +45,7 @@ func Test_Createslice(t *testing.T) {
 	at's test.
 */
 func Test_at(t *testing.T) {
-	slice, err := Createslice(3, 3, 1, 2, 3)
+	slice, err := CreatesliceE(3, 3, 1, 2, 3)
 	if err != nil {
 		t.Errorf("Createslice Err: %+v\n", err)
 	}
@@ -57,7 +57,7 @@ func Test_at(t *testing.T) {
 	}
 
 	for i, v := range inputs {
-		ptr, err := slice.at(v)
+		ptr, err := slice.atE(v)
 		if i < 0 && err == nil {
 			t.Errorf("expect err(%d), but got noerr\n", i)
 		}
@@ -76,7 +76,7 @@ type getResult struct {
 }
 
 func Test_Get(t *testing.T) {
-	testSlice, err := Createslice(2, 4, 1, 2)
+	testSlice, err := CreatesliceE(2, 4, 1, 2)
 	if err != nil {
 		t.Errorf("createSliceErr: %+v\n", err)
 	}
@@ -88,7 +88,7 @@ func Test_Get(t *testing.T) {
 	}
 
 	for i, v := range inputs {
-		result, err := testSlice.Get(v.input)
+		result, err := testSlice.GetE(v.input)
 		if i < 0 && err == nil {
 			t.Errorf("expect err(%d), but got noerr\n", i)
 		}
@@ -110,7 +110,7 @@ type setInput struct {
 }
 
 func Test_Set(t *testing.T) {
-	testSlice, err := Createslice(2, 4, 1, 2)
+	testSlice, err := CreatesliceE(2, 4, 1, 2)
 	if err != nil {
 		t.Errorf("createSliceErr: %+v\n", err)
 	}
@@ -123,8 +123,8 @@ func Test_Set(t *testing.T) {
 	}
 
 	for i, v := range inputs {
-		err := testSlice.Set(v.index, v.value)
-		result, _ := testSlice.Get(v.index)
+		err := testSlice.SetE(v.index, v.value)
+		result, _ := testSlice.GetE(v.index)
 		if i < 0 && err == nil {
 			t.Errorf("expect err(%d), but got noerr\n", i)
 		}
@@ -170,15 +170,15 @@ func Test_Map(t *testing.T) {
 	}
 
 	for _, v := range test_case {
-		slice, err := Createslice(v.len, v.len, v.init...)
+		slice, err := CreatesliceE(v.len, v.len, v.init...)
 		if err != nil {
 			t.Errorf("err: %+v\n", err)
 		}
 
-		slice.Map(v.callback)
+		slice.MapE(v.callback)
 
 		for i := 0; i < slice.Len; i++ {
-			val, _ := slice.Get(i)
+			val, _ := slice.GetE(i)
 			if val != v.expected[i] {
 				t.Errorf("expect %d, but got %d\n", v.expected[i], val)
 			}
@@ -218,13 +218,13 @@ func Test_Append(t *testing.T) {
 	}
 
 	for _, v := range testCase {
-		sampleSlice, err := Createslice(3, 10, 12, 32, 1)
+		sampleSlice, err := CreatesliceE(3, 10, 12, 32, 1)
 		if err != nil {
 			t.Errorf("err: %+v\n", err)
 		}
-		sampleSlice.Append(v.input)
+		sampleSlice.AppendE(v.input)
 		for s := 0; s < sampleSlice.Len; s++ {
-			if val, _ := sampleSlice.Get(s); val != v.result[s] {
+			if val, _ := sampleSlice.GetE(s); val != v.result[s] {
 				t.Errorf("expect %d, but got %d\n", v.result[s], val)
 			}
 		}

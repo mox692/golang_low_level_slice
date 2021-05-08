@@ -145,7 +145,7 @@ func (s *slice) AppendE(input []int) error {
 		if appended < 10 {
 			var newArr [TEN]int
 			for i := 0; i < appended; i++ {
-				if val, err := s.Get(i); i < s.Len {
+				if val, err := s.GetE(i); i < s.Len {
 					if err != nil {
 						return err
 					}
@@ -160,7 +160,10 @@ func (s *slice) AppendE(input []int) error {
 		} else if appended < 100 {
 			var newArr [HND]int
 			for i := 0; i < appended; i++ {
-				if val, _ := s.Get(i); i < s.Len {
+				if val, err := s.GetE(i); i < s.Len {
+					if err != nil {
+						return err
+					}
 					newArr[i] = val
 				} else {
 					newArr[i] = input[i-s.Len]
@@ -172,7 +175,10 @@ func (s *slice) AppendE(input []int) error {
 		} else if appended < 1000 {
 			var newArr [THOUS]int
 			for i := 0; i < appended; i++ {
-				if val, _ := s.Get(i); i < s.Len {
+				if val, err := s.GetE(i); i < s.Len {
+					if err != nil {
+						return err
+					}
 					newArr[i] = val
 				} else {
 					newArr[i] = input[i-s.Len]
