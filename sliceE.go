@@ -1,31 +1,17 @@
 package slice
 
 import (
+	"errors"
 	"unsafe"
 )
 
-type size = int
-
-const (
-	TEN   size = 10
-	HND   size = 100
-	THOUS size = 1000
-)
-
-type slice struct {
-	Data unsafe.Pointer
-	Len  int
-	Cap  int
-	Size size
-}
-
-func Createslice(length, cap int, elm ...int) *slice {
+func CreatesliceE(length, cap int, elm ...int) (*slice, error) {
 	if length < 0 || cap < 0 {
-		panic("len or cap must be positive number.")
+		return nil, errors.New("len or cap must be positive number.")
 	}
 
 	if length > cap {
-		panic("len must be less than cap.")
+		return nil, errors.New("len must be less than cap.")
 	}
 
 	if cap < 10 {
@@ -36,7 +22,7 @@ func Createslice(length, cap int, elm ...int) *slice {
 			}
 		}
 		slice := &slice{Cap: cap, Len: length, Data: unsafe.Pointer(&backgroundArr)}
-		return slice
+		return slice, nil
 	} else if cap < 100 {
 		var backgroundArr [HND]int
 
@@ -47,7 +33,7 @@ func Createslice(length, cap int, elm ...int) *slice {
 		}
 
 		slice := &slice{Cap: cap, Len: length, Data: unsafe.Pointer(&backgroundArr)}
-		return slice
+		return slice, nil
 	} else if cap < 1000 {
 		var backgroundArr [THOUS]int
 
@@ -58,55 +44,63 @@ func Createslice(length, cap int, elm ...int) *slice {
 		}
 
 		slice := &slice{Cap: cap, Len: length, Data: unsafe.Pointer(&backgroundArr)}
-		return slice
+		return slice, nil
 	} else {
-		panic("cannot create slice which cap is over 1000.")
+		return nil, errors.New("cannot create slice which cap is over 1000.")
 	}
 }
 
-func (s *slice) at(index int) unsafe.Pointer {
+func (s *slice) atE(index int) (unsafe.Pointer, error) {
 	if index < 0 {
-		panic("invalid index value, at's index must be positive number.")
+		return nil, errors.New("invalid index value, at's index must be positive number.")
 	}
 	if index > s.Cap-1 {
-		panic("invalid reference. index must be less than cap.")
+		return nil, errors.New("invalid reference. index must be less than cap.")
 	}
 
-	return unsafe.Pointer(uintptr(s.Data) + uintptr(index)*unsafe.Sizeof(int(0)))
+	return unsafe.Pointer(uintptr(s.Data) + uintptr(index)*unsafe.Sizeof(int(0))), nil
 }
 
-// TODO: errじゃなくてpanicを起こしてもいいかも
-func (s *slice) Get(index int) int {
+func (s *slice) GetE(index int) (int, error) {
 	if index < 0 {
-		panic("index must be positive value.")
+		return 0, errors.New("index must be positive value.")
 	}
 	if index > s.Len {
-		panic("index must be less than slice's cap.")
+		return 0, errors.New("index must be less than slice's cap.")
 	}
-	ptr := s.at(index)
-	return *(*int)(ptr)
+	ptr, err := s.atE(index)
+	if err != nil {
+		return 0, err
+	}
+	return *(*int)(ptr), nil
 }
 
-func (s *slice) Set(index, value int) {
+func (s *slice) SetE(index, value int) error {
 	if index < 0 {
-		panic("index must be positive value.")
+		return errors.New("index must be positive value.")
 	}
 	if index > s.Len {
-		panic("index must be less than slice's cap.")
+		return errors.New("index must be less than slice's cap.")
 	}
-	ptr := s.at(index)
+	ptr, err := s.atE(index)
+	if err != nil {
+		return err
+	}
 	*(*int)(ptr) = value
 
+	return nil
 }
 
-// ※user入力のsliceは許可する
-func (s *slice) Append(input []int) {
+func (s *slice) AppendE(input []int) error {
 	appended := s.Len + len(input)
 	if appended < s.Cap {
 		if s.Cap < 10 {
 			var newArr [TEN]int
 			for i := 0; i < appended; i++ {
-				if val := s.Get(i); i < s.Len {
+				if val, err := s.GetE(i); i < s.Len {
+					if err != nil {
+						return err
+					}
 					newArr[i] = val
 				} else {
 					newArr[i] = input[i-s.Len]
@@ -117,7 +111,10 @@ func (s *slice) Append(input []int) {
 		} else if s.Cap < 100 {
 			var newArr [HND]int
 			for i := 0; i < appended; i++ {
-				if val := s.Get(i); i < s.Len {
+				if val, err := s.GetE(i); i < s.Len {
+					if err != nil {
+						return err
+					}
 					newArr[i] = val
 				} else {
 					newArr[i] = input[i-s.Len]
@@ -128,7 +125,10 @@ func (s *slice) Append(input []int) {
 		} else if s.Cap < 1000 {
 			var newArr [THOUS]int
 			for i := 0; i < appended; i++ {
-				if val := s.Get(i); i < s.Len {
+				if val, err := s.GetE(i); i < s.Len {
+					if err != nil {
+						return err
+					}
 					newArr[i] = val
 				} else {
 					newArr[i] = input[i-s.Len]
@@ -137,15 +137,18 @@ func (s *slice) Append(input []int) {
 			s.Len = appended
 			s.Data = unsafe.Pointer(&newArr)
 		} else if appended >= 1000 {
-			panic("this slice can't have cap over 1000!")
+			return errors.New("this slice can't have cap over 1000!")
 		} else {
-			panic("Unexpected processing happen!")
+			return errors.New("Unexpected processing happen!")
 		}
 	} else if appended > s.Cap {
 		if appended < 10 {
 			var newArr [TEN]int
 			for i := 0; i < appended; i++ {
-				if val := s.Get(i); i < s.Len {
+				if val, err := s.GetE(i); i < s.Len {
+					if err != nil {
+						return err
+					}
 					newArr[i] = val
 				} else {
 					newArr[i] = input[i-s.Len]
@@ -157,7 +160,10 @@ func (s *slice) Append(input []int) {
 		} else if appended < 100 {
 			var newArr [HND]int
 			for i := 0; i < appended; i++ {
-				if val := s.Get(i); i < s.Len {
+				if val, err := s.GetE(i); i < s.Len {
+					if err != nil {
+						return err
+					}
 					newArr[i] = val
 				} else {
 					newArr[i] = input[i-s.Len]
@@ -169,7 +175,10 @@ func (s *slice) Append(input []int) {
 		} else if appended < 1000 {
 			var newArr [THOUS]int
 			for i := 0; i < appended; i++ {
-				if val := s.Get(i); i < s.Len {
+				if val, err := s.GetE(i); i < s.Len {
+					if err != nil {
+						return err
+					}
 					newArr[i] = val
 				} else {
 					newArr[i] = input[i-s.Len]
@@ -179,23 +188,28 @@ func (s *slice) Append(input []int) {
 			s.Cap = THOUS
 			s.Data = unsafe.Pointer(&newArr)
 		} else if appended >= 1000 {
-			panic("this slice can't have cap over 1000!")
+			return errors.New("this slice can't have cap over 1000!")
 		} else {
-			panic("Unexpected processing happen!")
+			return errors.New("Unexpected processing happen!")
 		}
 	}
-	return
+	return nil
 }
 
-// callbackはerrを返さない想定.
-// errは起こらないはず(slice構造体内部のデータからLenを取得してるので)なので、errは握り潰す
-func (s *slice) Map(callback func(int) int) {
+func (s *slice) MapE(callback func(int) int) error {
 	for i := 0; i < s.Len; i++ {
-		val := s.Get(i)
+		val, err := s.GetE(i)
+		if err != nil {
+			return err
+		}
 		result := callback(val)
-		s.Set(i, result)
+		err = s.SetE(i, result)
+		if err != nil {
+			return err
+		}
 	}
+	return nil
 }
 
-func (s *slice) Filter(callback func(int) int) {
+func (s *slice) FilterE(callback func(int) int) {
 }
