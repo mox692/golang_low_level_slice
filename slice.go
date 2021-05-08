@@ -108,8 +108,91 @@ func (s *slice) Set(index, value int) error {
 }
 
 // ※user入力のsliceは許可する
-func (s *slice) Append(input []int) error {
-	return nil
+func (s *slice) Append(input []int) {
+	appended := s.Len + len(input)
+	if appended < s.Cap {
+		if s.Cap < 10 {
+			var newArr [TEN]int
+			for i := 0; i < appended; i++ {
+				if val, _ := s.Get(i); i < s.Len {
+					newArr[i] = val
+				} else {
+					newArr[i] = input[i-s.Len]
+				}
+			}
+			s.Len = appended
+			s.Data = unsafe.Pointer(&newArr)
+		} else if s.Cap < 100 {
+			var newArr [HND]int
+			for i := 0; i < appended; i++ {
+				if val, _ := s.Get(i); i < s.Len {
+					newArr[i] = val
+				} else {
+					newArr[i] = input[i-s.Len]
+				}
+			}
+			s.Len = appended
+			s.Data = unsafe.Pointer(&newArr)
+		} else if s.Cap < 1000 {
+			var newArr [THOUS]int
+			for i := 0; i < appended; i++ {
+				if val, _ := s.Get(i); i < s.Len {
+					newArr[i] = val
+				} else {
+					newArr[i] = input[i-s.Len]
+				}
+			}
+			s.Len = appended
+			s.Data = unsafe.Pointer(&newArr)
+		} else if appended >= 1000 {
+			panic("this slice can't have cap over 1000!")
+		} else {
+			panic("Unexpected processing happen!")
+		}
+	} else if appended > s.Cap {
+		if appended < 10 {
+			var newArr [TEN]int
+			for i := 0; i < appended; i++ {
+				if val, _ := s.Get(i); i < s.Len {
+					newArr[i] = val
+				} else {
+					newArr[i] = input[i-s.Len]
+				}
+			}
+			s.Len = appended
+			s.Cap = TEN
+			s.Data = unsafe.Pointer(&newArr)
+		} else if appended < 100 {
+			var newArr [HND]int
+			for i := 0; i < appended; i++ {
+				if val, _ := s.Get(i); i < s.Len {
+					newArr[i] = val
+				} else {
+					newArr[i] = input[i-s.Len]
+				}
+			}
+			s.Len = appended
+			s.Cap = HND
+			s.Data = unsafe.Pointer(&newArr)
+		} else if appended < 1000 {
+			var newArr [THOUS]int
+			for i := 0; i < appended; i++ {
+				if val, _ := s.Get(i); i < s.Len {
+					newArr[i] = val
+				} else {
+					newArr[i] = input[i-s.Len]
+				}
+			}
+			s.Len = appended
+			s.Cap = THOUS
+			s.Data = unsafe.Pointer(&newArr)
+		} else if appended >= 1000 {
+			panic("this slice can't have cap over 1000!")
+		} else {
+			panic("Unexpected processing happen!")
+		}
+	}
+	return
 }
 
 // callbackはerrを返さない想定.

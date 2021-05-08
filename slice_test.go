@@ -186,3 +186,47 @@ func Test_Map(t *testing.T) {
 	}
 
 }
+
+/*
+	Append's test.
+*/
+type appendTestCase struct {
+	input     []int
+	result    []int
+	errString string
+}
+
+func Test_Append(t *testing.T) {
+	// defer func() {
+	// 	err := recover()
+	// 	if err != nil {
+	// 		t.Errorf("err: %+v\n", err)
+	// 	}
+	// }()
+
+	testCase := []appendTestCase{
+		{
+			input:     []int{3, 4},
+			result:    []int{12, 32, 1, 3, 4},
+			errString: "",
+		},
+		{
+			input:     []int{3, 412, 32, 1, 3, 4, 12, 32, 1, 3, 4, 3, 412, 32, 1, 3, 4, 12, 32, 1, 3, 4},
+			result:    []int{12, 32, 1, 3, 412, 32, 1, 3, 4, 12, 32, 1, 3, 4, 3, 412, 32, 1, 3, 4, 12, 32, 1, 3, 4}, //
+			errString: "",
+		},
+	}
+
+	for _, v := range testCase {
+		sampleSlice, err := Createslice(3, 10, 12, 32, 1)
+		if err != nil {
+			t.Errorf("err: %+v\n", err)
+		}
+		sampleSlice.Append(v.input)
+		for s := 0; s < sampleSlice.Len; s++ {
+			if val, _ := sampleSlice.Get(s); val != v.result[s] {
+				t.Errorf("expect %d, but got %d\n", v.result[s], val)
+			}
+		}
+	}
+}
