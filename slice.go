@@ -102,11 +102,12 @@ func (s *slice) Set(index, value int) {
 // ※user入力のsliceは許可する
 func (s *slice) Append(input []int) {
 	appended := s.Len + len(input)
-	if appended < s.Cap {
+	if appended <= s.Cap {
 		if s.Cap < 10 {
 			var newArr [TEN]int
 			for i := 0; i < appended; i++ {
-				if val := s.Get(i); i < s.Len {
+				if i < s.Len {
+					val := s.Get(i)
 					newArr[i] = val
 				} else {
 					newArr[i] = input[i-s.Len]
@@ -117,7 +118,8 @@ func (s *slice) Append(input []int) {
 		} else if s.Cap < 100 {
 			var newArr [HND]int
 			for i := 0; i < appended; i++ {
-				if val := s.Get(i); i < s.Len {
+				if i < s.Len {
+					val := s.Get(i)
 					newArr[i] = val
 				} else {
 					newArr[i] = input[i-s.Len]
@@ -128,7 +130,8 @@ func (s *slice) Append(input []int) {
 		} else if s.Cap < 1000 {
 			var newArr [THOUS]int
 			for i := 0; i < appended; i++ {
-				if val := s.Get(i); i < s.Len {
+				if i < s.Len {
+					val := s.Get(i)
 					newArr[i] = val
 				} else {
 					newArr[i] = input[i-s.Len]
@@ -145,7 +148,8 @@ func (s *slice) Append(input []int) {
 		if appended < 10 {
 			var newArr [TEN]int
 			for i := 0; i < appended; i++ {
-				if val := s.Get(i); i < s.Len {
+				if i < s.Len {
+					val := s.Get(i)
 					newArr[i] = val
 				} else {
 					newArr[i] = input[i-s.Len]
@@ -157,7 +161,8 @@ func (s *slice) Append(input []int) {
 		} else if appended < 100 {
 			var newArr [HND]int
 			for i := 0; i < appended; i++ {
-				if val := s.Get(i); i < s.Len {
+				if i < s.Len {
+					val := s.Get(i)
 					newArr[i] = val
 				} else {
 					newArr[i] = input[i-s.Len]
@@ -169,7 +174,8 @@ func (s *slice) Append(input []int) {
 		} else if appended < 1000 {
 			var newArr [THOUS]int
 			for i := 0; i < appended; i++ {
-				if val := s.Get(i); i < s.Len {
+				if i < s.Len {
+					val := s.Get(i)
 					newArr[i] = val
 				} else {
 					newArr[i] = input[i-s.Len]
