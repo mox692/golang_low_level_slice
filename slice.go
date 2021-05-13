@@ -203,5 +203,34 @@ func (s *slice) Map(callback func(int) int) {
 	}
 }
 
-func (s *slice) Filter(callback func(int) int) {
+func (s *slice) Filter(callback func(int) bool) {
+	len := 0
+	var arr [1000]int
+	for i := 0; i < s.Len; i++ {
+		val := s.Get(i)
+		if callback(val) == true {
+			arr[len] = i
+			len++
+		}
+	}
+	s.Len = len
+	if s.Len < 10 {
+		var newArr [10]int
+		for i := 0; i < len; i++ {
+			newArr[i] = s.Get(arr[i])
+		}
+		s.Data = unsafe.Pointer(&newArr)
+	} else if s.Len < 100 {
+		var newArr [100]int
+		for i := 0; i < len; i++ {
+			newArr[i] = s.Get(arr[i])
+		}
+		s.Data = unsafe.Pointer(&newArr)
+	} else if s.Len < 1000 {
+		var newArr [1000]int
+		for i := 0; i < len; i++ {
+			newArr[i] = s.Get(arr[i])
+		}
+		s.Data = unsafe.Pointer(&newArr)
+	}
 }
